@@ -9,6 +9,7 @@
 constexpr int DONIX_FACE_WIDTH = 128;
 constexpr int DONIX_FACE_HEIGHT = 64;
 
+
 enum DonixExpression {
     DONIX_NORMAL,
     DONIX_HAPPY,
@@ -16,7 +17,7 @@ enum DonixExpression {
     DONIX_ANGRY,
     DONIX_SURPRISED,
     DONIX_SLEEPY,
-    DONIX_THINKING
+    DONIX_THINKING,
 };
 
 enum DonixState {
@@ -30,7 +31,6 @@ enum DonixState {
 class DonixFace {
     public: 
         DonixFace(Adafruit_SH1106G& display);
-        
         bool begin();
         void update();
         void setExpression(DonixExpression expression);
@@ -61,8 +61,10 @@ class DonixFace {
         unsigned long _talkStart;
 
         bool _blinkActive;
+        uint8_t _blinkFrame = 0;
+        uint8_t _talkFrame = 0;
 
-        uint8_t _talkFrame;
+
 
         void drawFace();
         void drawEyes();
@@ -93,5 +95,4 @@ class DonixFace {
         void drawThinkingMouth();
         void drawBlink();
         void clearFace();
-
 };

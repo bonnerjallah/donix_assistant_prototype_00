@@ -48,21 +48,33 @@ void DonixFace::update() {
 
     if (_blinkActive) {
 
-        if (now - _blinkStart < 120) {
+    unsigned long elapsed = now - _blinkStart;
 
-        _talkStart;
-
-            drawBlink();
-
-            display_.display();
-
-            return;
-        }
-
+    if (elapsed < 60) {
+        _blinkFrame = 1;
+    }
+    else if (elapsed < 120) {
+        _blinkFrame = 2;
+    }
+    else if (elapsed < 180) {
+        _blinkFrame = 1;
+    }
+    else {
         _blinkActive = false;
-
+        _blinkFrame = 0;
         _lastBlinkTime = now;
     }
+
+    if (_blinkActive) {
+        display_.clearDisplay();
+
+        drawBlink();
+
+        display_.display();
+
+        return;
+    }
+}
 
 
     /*
@@ -201,6 +213,7 @@ void DonixFace::drawEyes() {
         case DONIX_THINKING:
             drawThinkingEyes();
             break;
+        
 
         default:
             drawNormalEyes();
@@ -397,41 +410,34 @@ void DonixFace::drawSleepyEyes() {
     );
 }
 
-
 void DonixFace::drawThinkingEyes() {
+
     display_.fillRoundRect(
-        18,
-        18,
-        30,
-        24,
+        18, 18,
+        30, 24,
         7,
         SH110X_WHITE
     );
 
     display_.fillRoundRect(
-        80,
-        18,
-        30,
-        24,
+        80, 18,
+        30, 24,
         7,
         SH110X_WHITE
     );
 
     display_.fillCircle(
-        39,
-        27,
+        39, 27,
         5,
         SH110X_BLACK
     );
 
     display_.fillCircle(
-        101,
-        27,
+        101, 27,
         5,
         SH110X_BLACK
     );
 }
-
 
 /*
  * EYEBROWS
@@ -788,25 +794,50 @@ void DonixFace::drawTalkingMouth() {
 */
 
 void DonixFace::drawBlink() {
-    display_.drawLine(
-        18,
-        29,
-        48,
-        29,
-        SH110X_WHITE
-    );
 
-    display_.drawLine(
-        80,
-        29,
-        110,
-        29,
-        SH110X_WHITE
-    );
+    switch (_blinkFrame) {
 
-    /*
-     * Keep mouth visible during blink.
-    */
+        // Partially closed
+        case 1:
 
+            display_.fillRoundRect(
+                18, 25,
+                30, 10,
+                5,
+                SH110X_WHITE
+            );
+
+            display_.fillRoundRect(
+                80, 25,
+                30, 10,
+                5,
+                SH110X_WHITE
+            );
+
+            break;
+
+
+        // Fully closed
+        case 2:
+
+            display_.drawLine(
+                18, 29,
+                48, 29,
+                SH110X_WHITE
+            );
+
+            display_.drawLine(
+                80, 29,
+                110, 29,
+                SH110X_WHITE
+            );
+
+            break;
+    }
+
+    // Keep eyebrows visible
+    drawEyeBrows();
+
+    // Keep mouth visible
     drawMouth();
 }
