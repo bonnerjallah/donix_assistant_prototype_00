@@ -15,7 +15,7 @@ const int MIC_WARMUP_BUFFERS = 10;
 
 const int32_t SOUND_THRESHOLD = 30000000;
 
-const int RECORD_SAMPLES = 16000 * 5;
+const int RECORD_SAMPLES = 24000 * 5;
 
 int32_t micBuffer[1024];
 

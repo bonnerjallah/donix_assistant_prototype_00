@@ -4,6 +4,8 @@
 
 #include "ws_socket.h"
 #include "secrets.h"
+#include "amp.h"
+
 
 WebSocketsClient webSocket;
 
@@ -36,6 +38,17 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
         case WStype_BIN:
             Serial.println("ESP32 <- Binary received");
+
+            // send received PCM data to I2S amplifier
+            size_t bytes_written;
+
+            i2s_write(
+                AMP_I2S_PORT,
+                payload,
+                length,
+                &bytes_written,
+                portMAX_DELAY
+            );
 
             break;
 
