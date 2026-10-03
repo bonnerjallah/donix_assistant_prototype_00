@@ -13,7 +13,7 @@ DonixFace::DonixFace( Adafruit_SH1106G& display ) : display_(display) {
     _talkStart = 0;
 
     _blinkActive = false;
-
+                                                   
     _talkFrame = 0;
 }
 

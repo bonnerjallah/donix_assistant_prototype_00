@@ -5,6 +5,7 @@
 #include "ws_socket.h"
 #include "secrets.h"
 #include "amp.h"
+#include "audioqueue.h"
 
 
 WebSocketsClient webSocket;
@@ -22,35 +23,46 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
         case WStype_DISCONNECTED:
             Serial.println("ESP32 -> WebSocket DISCONNECTED");
 
-            break;
+        break;
 
         case WStype_CONNECTED:
             Serial.println("ESP32 -> WebSocket CONNECTED");
             webSocket.sendTXT("Hello from ESP32");
 
-            break;
+        break;
 
         case WStype_TEXT:
-            Serial.print("ESP32 <- ");
-            Serial.println((char*)payload);
+
+        Serial.print("ESP32 <- ");
+        Serial.println((char*)payload);
+
+        if (strcmp( (char*)payload, "AUDIO_PLAYBACK_DONE") == 0) {
+
+            Serial.println("ESP32: OpenAI audio stream finished.");
+        }
+
+        break;
+
+        case WStype_BIN: {
+
+            Serial.printf( "ESP32 <- Binary received: %d bytes\n", length);
+
+            const int16_t* pcmData = reinterpret_cast<const int16_t*>(payload);
+
+            size_t sampleCount = length / sizeof(int16_t);
+
+
+            if (!audioQueue.push( pcmData, sampleCount)) {
+
+                Serial.println( "PCM QUEUE FULL - audio chunk dropped");
+
+            } else {
+
+                Serial.printf( "PCM queued: %d samples | queue: %d\n", sampleCount, audioQueue.available());
+            }
 
             break;
-
-        case WStype_BIN:
-            Serial.println("ESP32 <- Binary received");
-
-            // send received PCM data to I2S amplifier
-            size_t bytes_written;
-
-            i2s_write(
-                AMP_I2S_PORT,
-                payload,
-                length,
-                &bytes_written,
-                portMAX_DELAY
-            );
-
-            break;
+        }
 
         case WStype_ERROR:
             Serial.println("ESP32 <- WebSocket error");
@@ -60,7 +72,7 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
                 Serial.println();
             }
             
-            break;
+        break;
             
         default:
             Serial.println("ESP32 -> Other WebSocket event");

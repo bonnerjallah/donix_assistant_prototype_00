@@ -45,11 +45,8 @@ export const sendToOpenAI = async (pcmData) => {
 
         const data = JSON.parse(responseText);
 
-        console.log("Transcription result:", data);
-
         userInput = data.text || "";
 
-        console.log("Transcribed text:", userInput);
 
     } catch (error) {
         console.error("Error sending PCM data to OpenAI:", error);
@@ -96,7 +93,6 @@ export const sendToESP32 = (socket, binaryAudio) => {
 
     const CHUNK_SIZE = 2048; // Define the chunk size for sending data
 
-    console.log("Sending tts audio:", binaryAudio.length, "bytes");
 
     for (let offset = 0; offset < binaryAudio.length; offset += CHUNK_SIZE) {
 
